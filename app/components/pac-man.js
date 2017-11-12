@@ -1,6 +1,7 @@
 // in app/components/pac-man.js
 import Ember from 'ember';
-export default Ember.Component.extend({
+import KeyboardShortcuts from 'ember-keyboard-shortcuts/mixins/component';
+export default Ember.Component.extend(KeyboardShortcuts,{
   didInsertElement: function() {
     this.drawCircle();
   },
