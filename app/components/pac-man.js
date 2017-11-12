@@ -22,6 +22,12 @@ export default Ember.Component.extend(KeyboardShortcuts, {
         ctx.fill();
     },
 
+    movePacMan: function(direction, amount){
+      this.incrementProperty(direction, amount);
+      this.clearScreen();
+      this.drawCircle();
+    },
+
     clearScreen: function() {
       let canvas = document.getElementById("myCanvas");
       let ctx = canvas.getContext("2d");
@@ -32,9 +38,9 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     },
 
     keyboardShortcuts: {
-      up: function() { this.incrementProperty('y', -1 * this.get('squareSize')); this.clearScreen(); this.drawCircle()},
-      down: function() { this.incrementProperty('y', this.get('squareSize')); this.clearScreen(); this.drawCircle()},
-      left: function() { this.incrementProperty('x', -1 * this.get('squareSize')); this.clearScreen(); this.drawCircle()},
-      right: function() { this.incrementProperty('x', this.get('squareSize')); this.clearScreen(); this.drawCircle();},
+      up: function() { this.movePacMan('y', -1 * this.get('squareSize'));},
+      down: function() { this.movePacMan('y', this.get('squareSize'));},
+      left: function() { this.movePacMan('x', -1 * this.get('squareSize'));},
+      right: function() { this.movePacMan('x', this.get('squareSize'));;},
     },
 });
