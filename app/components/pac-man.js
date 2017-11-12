@@ -12,7 +12,8 @@ export default Ember.Component.extend({
     let radius = 20;
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2, false); ctx.closePath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+    ctx.closePath();
     ctx.fill();
   },
 });
