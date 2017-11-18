@@ -5,12 +5,18 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     didInsertElement: function() {
         this.drawCircle();
     },
-    x:50,
-    y: 100,
+    x: 1,
+    y: 2,
     squareSize: 40,
+
+    ctx: Ember.computed(function(){
+      let canvas = document.getElementById("myCanvas");
+      let ctx = canvas.getContext("2d");
+      return ctx;
+    }),
+
     drawCircle: function() {
-        let canvas = document.getElementById("myCanvas");
-        let ctx = canvas.getContext("2d");
+        let ctx = this.get('ctx')
         let x = this.get('x');
         let y = this.get('y');
         let radius = this.get('squareSize')/2;
@@ -29,8 +35,7 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     },
 
     clearScreen: function() {
-      let canvas = document.getElementById("myCanvas");
-      let ctx = canvas.getContext("2d");
+      let ctx = this.get("ctx");
       let screenWidth = 800;
       let screenHeight = 600;
 
