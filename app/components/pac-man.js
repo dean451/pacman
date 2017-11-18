@@ -55,4 +55,28 @@ export default Ember.Component.extend(KeyboardShortcuts, {
       left: function() { this.movePacMan('x', -1);},
       right: function() { this.movePacMan('x', 1);},
     },
+
+    movePacMan(direction, amount){
+      this.incrementProperty(direction, amount);
+
+      if(this.collidedWithBorder()) {
+        this.decrementProperty(direction, amount)
+      }
+
+      this.clearScreen();
+      this.drawCircle();
+    },
+
+    collidedWithBorder: function(){
+      let x = this.get('x');
+      let y = this.get('y');
+      let screenHeight = this.get('screenHeight');
+      let screenWidth = this.get('screenWidth');
+
+      let pacOutOfBounds = x < 0 ||
+                           y < 0 ||
+                           x >= screenWidth ||
+                           y >= screenHeight
+      return pacOutOfBounds
+    }
 });
