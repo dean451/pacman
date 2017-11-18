@@ -8,6 +8,12 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     x: 1,
     y: 2,
     squareSize: 40,
+    screenWidth: 20,
+    screenHeight: 15,
+    walls: [
+            {x: 1, y: 1},
+            {x:8, y:5}
+           ],
 
     screenPixelWidth: Ember.computed(function(){
       return this.get('screenWidth') * this.get('squareSize');
@@ -44,13 +50,12 @@ export default Ember.Component.extend(KeyboardShortcuts, {
         ctx.fill();
     },
 
-    movePacMan: function(direction, amount){
-      this.incrementProperty(direction, amount);
-      this.clearScreen();
+    didInsertElement(){
+      this.drawWalls();
       this.drawCircle();
     },
-    screenWidth: 20,
-    screenHeight: 15,
+
+
     clearScreen: function() {
       let ctx = this.get("ctx");
       ctx.clearRect(0, 0, this.get('screenPixelWidth'), this.get('screenPixelHeight'));
@@ -71,6 +76,7 @@ export default Ember.Component.extend(KeyboardShortcuts, {
       }
 
       this.clearScreen();
+      this.drawWalls();
       this.drawCircle();
     },
 
@@ -85,5 +91,18 @@ export default Ember.Component.extend(KeyboardShortcuts, {
                            x >= screenWidth ||
                            y >= screenHeight
       return pacOutOfBounds
-    }
+    },
+
+    drawWalls: function(){
+      let squareSize = this.get('squareSize');
+      let ctx = this.get('ctx');
+      ctx.fillStyle = '#000';
+      let walls = this.get('walls');
+      walls.forEach(function(wall){
+        ctx.fillRect(wall.x * squareSize,
+                     wall.y * squareSize,
+                              squareSize,
+                              squareSize)
+               })
+        },
 });
