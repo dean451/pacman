@@ -15,12 +15,16 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     return this.get('grid.length');
   }),
   grid: [
-    [0,0,0,0,0,0,0,1],
-    [0,1,0,1,0,0,0,1],
-    [0,0,1,0,0,0,0,1],
-    [0,0,0,0,0,0,0,1],
-    [0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,1],
+    [2,2,2,2,2,2,2,1,2,2,2,2],
+    [2,1,2,1,2,2,2,1,2,2,2,2],
+    [2,2,1,2,2,2,2,2,2,2,2,2],
+    [2,2,2,2,2,2,1,2,2,2,2,2],
+    [2,2,2,2,1,2,2,1,2,2,2,2],
+    [1,2,2,2,2,2,2,1,2,2,2,2],
+    [1,2,2,2,2,2,2,1,2,2,2,2],
+    [1,2,2,1,2,2,2,2,2,2,2,2],
+    [1,2,2,2,1,2,2,1,2,2,2,2],
+    [1,2,2,2,2,2,2,1,2,2,2,2]
   ],
 
   screenPixelWidth: Ember.computed(function(){
@@ -121,6 +125,16 @@ export default Ember.Component.extend(KeyboardShortcuts, {
             rowIndex * squareSize,
             squareSize,
             squareSize)
+          }
+          //new stuff starts here
+          if(cell == 2) {
+            let pixelX = (columnIndex + 1/2) * squareSize;
+            let pixelY = (rowIndex + 1/2) * squareSize;
+
+            ctx.beginPath();
+            ctx.arc(pixelX, pixelY, squareSize/6, 0, Math.PI * 2, false);
+            ctx.closePath();
+            ctx.fill();
           }
         })
       })
