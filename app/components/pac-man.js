@@ -15,16 +15,16 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     return this.get('grid.length');
   }),
   grid: [
-    [2,2,2,2,2,2,2,1,2,2,2,2],
-    [2,1,2,1,2,2,2,1,2,2,2,2],
-    [2,2,1,2,2,2,2,2,2,2,2,2],
-    [2,2,2,2,2,2,1,2,2,2,2,2],
-    [2,2,2,2,1,2,2,1,2,2,2,2],
-    [1,2,2,2,2,2,2,1,2,2,2,2],
-    [1,2,2,2,2,2,2,1,2,2,2,2],
-    [1,2,2,1,2,2,2,2,2,2,2,2],
-    [1,2,2,2,1,2,2,1,2,2,2,2],
-    [1,2,2,2,2,2,2,1,2,2,2,2]
+    [2,2,2,2,2,2,2,1,2,2,2,2,2,2],
+    [2,1,2,1,2,2,2,1,2,2,2,1,2,2],
+    [2,2,1,2,2,2,2,2,2,2,2,2,2,2],
+    [2,2,2,2,2,2,1,2,2,2,1,2,2,2],
+    [2,2,2,2,1,2,2,1,2,2,2,1,2,2],
+    [1,2,2,2,2,2,2,1,2,2,2,2,1,2],
+    [1,2,2,2,2,2,2,1,2,2,2,1,2,2],
+    [1,2,2,1,2,2,2,2,2,2,2,1,2,2],
+    [1,2,2,2,1,2,2,1,2,2,2,2,2,2],
+    [1,2,2,2,2,2,2,1,2,2,2,2,2,2]
   ],
 
   screenPixelWidth: Ember.computed(function(){
@@ -43,28 +43,53 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     return ctx;
   }),
 
-  drawCircle: function() {
-    let ctx = this.get('ctx')
+  // drawCircle: function() {
+  //   let ctx = this.get('ctx')
+  //   let x = this.get('x');
+  //   let y = this.get('y');
+  //   let squareSize = this.get('squareSize');
+  //
+  //   let pixelX = (x+1/2) * squareSize;
+  //   let pixelY = (y+1/2) * squareSize;
+  //
+  //   // let pixelX = (x) * squareSize;
+  //   // let pixelY = (y) * squareSize;
+  //
+  //   ctx.fillStyle = "#000";
+  //   ctx.beginPath();
+  //   ctx.arc(pixelX, pixelY, squareSize/2, 0, Math.PI * 2, false);
+  //   ctx.closePath();
+  //   ctx.fill();
+  // },
+
+  drawPac(){
     let x = this.get('x');
     let y = this.get('y');
-    let squareSize = this.get('squareSize');
+    let radiusDivisor = 2;
+    this.drawCircle(x,y,radiusDivisor)
+  },
 
+  drawPellet(x,y) {
+    let radiusDivisor = 6;
+    this.drawCircle(x,y,radiusDivisor)
+  },
+
+  drawCircle(x,y,radiusDivisor){
+    let ctx = this.get('ctx')
+    let squareSize = this.get('squareSize');
     let pixelX = (x+1/2) * squareSize;
     let pixelY = (y+1/2) * squareSize;
 
-    // let pixelX = (x) * squareSize;
-    // let pixelY = (y) * squareSize;
-
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = '#000'
     ctx.beginPath();
-    ctx.arc(pixelX, pixelY, squareSize/2, 0, Math.PI * 2, false);
+    ctx.arc(pixelX, pixelY, squareSize/radiusDivisor, 0, Math.PI * 2, false);
     ctx.closePath();
     ctx.fill();
   },
 
   didInsertElement(){
-    this.drawWalls();
-    this.drawCircle();
+    this.drawGrid();
+    this.drawPac();
   },
 
 
@@ -86,10 +111,21 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     if(this.collidedWithBorder() || this.collidedWithWall()) {
       this.decrementProperty(direction, amount)
     }
+    this.processAnyPellets()
 
     this.clearScreen();
-    this.drawWalls();
-    this.drawCircle();
+    this.drawGrid();
+    this.drawPac();
+  },
+
+  processAnyPellets: function(){
+    let x = this.get('x');
+    let y = this.get('y');
+    let grid = this.get('grid');
+
+    if(grid[y][x]==2){
+      grid[y][x] = 0;
+    }
   },
 
   collidedWithBorder: function(){
@@ -113,28 +149,42 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     return grid[y][x] == 1
   },
 
-  drawWalls: function(){
+  drawWall: function(x,y) {
+    let squareSize = this.get("squareSize");
+    let ctx = this.get("ctx");
+    ctx.fillStyle = "#000";
+    ctx.fillRect(x * squareSize,
+               y * squareSize,
+               squareSize,
+               squareSize)
+  },
+
+  drawPellet(x,y){
+    let ctx = this.get('ctx')
+    let squareSize = this.get('squareSize');
+    let pixelX = (x+1/2) * squareSize;
+    let pixelY = (y+1/2) * squareSize;
+
+    ctx.fillStyle = "#000"
+    ctx.beginPath();
+    ctx.arc(pixelX, pixelY, squareSize/6, 0, Math.PI * 2, false);
+    ctx.closePath();
+    ctx.fill();
+  },
+
+  drawGrid: function(){
     let squareSize = this.get('squareSize');
     let ctx = this.get('ctx');
     ctx.fillStyle = '#000';
     let grid = this.get('grid');
-    grid.forEach(function(row, rowIndex){
-      row.forEach(function(cell, columnIndex){
+    grid.forEach((row, rowIndex)=> {
+      row.forEach((cell, columnIndex)=> {
         if(cell == 1){
-          ctx.fillRect(columnIndex * squareSize,
-            rowIndex * squareSize,
-            squareSize,
-            squareSize)
+          this.drawWall(columnIndex, rowIndex)
           }
           //new stuff starts here
           if(cell == 2) {
-            let pixelX = (columnIndex + 1/2) * squareSize;
-            let pixelY = (rowIndex + 1/2) * squareSize;
-
-            ctx.beginPath();
-            ctx.arc(pixelX, pixelY, squareSize/6, 0, Math.PI * 2, false);
-            ctx.closePath();
-            ctx.fill();
+          this.drawPellet(columnIndex, rowIndex)
           }
         })
       })
