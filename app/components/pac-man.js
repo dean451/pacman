@@ -15,17 +15,23 @@ export default Ember.Component.extend(KeyboardShortcuts, {
     return this.get('grid.length');
   }),
   grid: [
-    [2,2,2,2,2,2,2,1,2,2,2,2,2,2],
-    [2,1,2,1,2,2,2,1,2,2,2,1,2,2],
-    [2,2,1,2,2,2,2,2,2,2,2,2,2,2],
-    [2,2,2,2,2,2,1,2,2,2,1,2,2,2],
-    [2,2,2,2,1,2,2,1,2,2,2,1,2,2],
-    [1,2,2,2,2,2,2,1,2,2,2,2,1,2],
-    [1,2,2,2,2,2,2,1,2,2,2,1,2,2],
-    [1,2,2,1,2,2,2,2,2,2,2,1,2,2],
-    [1,2,2,2,1,2,2,1,2,2,2,2,2,2],
-    [1,2,2,2,2,2,2,1,2,2,2,2,2,2]
+    [2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    [2,1,2,1,2,2,2,1,2,2,2,1,2,2,2,2,2,2,2,2,2,2],
+    [2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    [2,2,2,2,2,2,1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2],
+    [2,2,2,2,1,2,2,1,2,2,2,1,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,1,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,1,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,1,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+    // [1,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
   ],
+
+  score: 0,
+  levelNumber: 1,
 
   screenPixelWidth: Ember.computed(function(){
     return this.get('screenWidth') * this.get('squareSize');
@@ -125,7 +131,27 @@ export default Ember.Component.extend(KeyboardShortcuts, {
 
     if(grid[y][x]==2){
       grid[y][x] = 0;
+      this.incrementProperty('score')
+
+      if(this.levelComplete()){
+        this.incrementProperty('levelNumber')
+        this.restartLevel()
+      }
     }
+  },
+
+  restartLevel: function(){
+    this.set('x', 0);
+    this.set('y', 0);
+
+    let grid = this.get('grid');
+    grid.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        if(cell == 0) {
+          grid[rowIndex][columnIndex] = 2
+        }
+      })
+    })
   },
 
   collidedWithBorder: function(){
@@ -189,4 +215,20 @@ export default Ember.Component.extend(KeyboardShortcuts, {
         })
       })
     },
+
+    levelComplete: function() {
+      let hasPelletsLeft = false;
+      let grid = this.get('grid');
+
+      grid.forEach((row)=> {
+        row.forEach((cell)=> {
+          if(cell == 2){
+            hasPelletsLeft = true
+          }
+        })
+      })
+      return !hasPelletsLeft;
+    }
+
+
   });
