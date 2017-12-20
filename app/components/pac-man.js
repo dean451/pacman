@@ -39,8 +39,7 @@ export default Ember.Component.extend(KeyboardShortcuts, {
         return this.get("grid.firstObject.length");
     }),
     didInsertElement() {
-        this.drawGrid();
-        this.drawPac();
+        this.movementLoop();
     },
     directions: {
         "up":      { x: 0,  y: -1 },
@@ -49,30 +48,32 @@ export default Ember.Component.extend(KeyboardShortcuts, {
         "right":   { x: 1,  y: 0 },
         "stopped": { x: 0,  y: 0 }
     },
+    intent: 'down',
+
     keyboardShortcuts: {
         up() {
-            this.movePacMan("up");
+            this.set('intent', "up");
         },
         down() {
-            this.movePacMan("down");
+            this.set('intent', "down");
         },
         left() {
-            this.movePacMan("left");
+            this.set('intent', "left");
         },
         right() {
-            this.movePacMan("right");
+            this.set('intent', "right");
         },
     },
     clearScreen() {
          let ctx = this.get("ctx");
          ctx.clearRect(0, 0, this.get("screenPixelWidth"), this.get("screenPixelHeight"));
     },
-    movePacMan(direction) {
-        let inputBlocked = this.get("isMoving") || this.pathBlockedInDirection(direction)
-        if (!inputBlocked) {
-            this.set("direction", direction)
-            this.set("isMoving", true)
-            this.movementLoop()
+    changePacDirection() {
+        let intent = this.get('intent')
+        if(this.pathBlockedInDirection(intent)) {
+           this.set('direction', 'stopped');
+        } else {
+           this.set('direction', intent);
         }
     },
     nextCoordinate(coordinate, direction){
@@ -193,15 +194,19 @@ export default Ember.Component.extend(KeyboardShortcuts, {
             let direction = this.get("direction");
             this.set("x", this.nextCoordinate("x", direction));
             this.set("y", this.nextCoordinate("y", direction));
-            this.set("isMoving", false);
             this.set("frameCycle", 1);
             this.processAnyPellets();
-        } else {
+
+            this.changePacDirection();
+          } else if (this.get('direction') == 'stopped') {
+            this.changePacDirection();
+          } else {
             this.incrementProperty("frameCycle");
-            Ember.run.later(this, this.movementLoop, 1000/60);
+
         }
         this.clearScreen();
         this.drawGrid();
         this.drawPac();
+        Ember.run.later(this, this.movementLoop, 1000/60);
     }
 });
